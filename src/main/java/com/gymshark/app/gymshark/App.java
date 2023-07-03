@@ -22,8 +22,8 @@ public class App
 	static final String PASSWORD_TEXTBOX = "login-password";
 	static final String LOGIN_BUTTON = ".btn.py-3-2.w-100.btn-brand-primary";
 	static final String BOOKING_BUTTON = ".svg-inline--fa.fa-plus"; //blue plus button on home page that opens booking pop-up
-	static final String START_TIME_DROPDOWN = "f1fb16f5-436e-46f9-a280-f7a222673458"; 
-	static final String END_TIME_DROPDOWN = "d71068fc-d478-4863-a159-4ba5809f81be";
+	static final String START_TIME_DROPDOWN = ".col-6.col-lg-3.mb-std.pe-2"; 
+	static final String END_TIME_DROPDOWN = "col-6 col-lg-3 mb-std ps-2";
 	
 	
 	//Initiating your Chrome driver
@@ -44,8 +44,8 @@ public class App
 	String suiteNumber = args[5];
 	
 	//Handle time formatting
-	startTime = formatTime(startTime);
-	endTime = formatTime(endTime);
+	startTime = formatTime(startTime).strip();
+	endTime = formatTime(endTime).strip();
 		
 	//Applied wait time
 	driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
@@ -75,7 +75,7 @@ public class App
 	selectStartTime(startTime);
 	
 	//closing the browser
-	driver.close();
+	//driver.close();
 	}
 	
 	private static void login(String username, String password) throws InterruptedException {
@@ -105,18 +105,35 @@ public class App
 	}
 	
 	private static void clickStartTimeDropdown() {
-		WebElement startTimeDropdown = driver.findElement(By.id(START_TIME_DROPDOWN));
+		WebElement startTimeDropdown = driver.findElement(By.cssSelector(START_TIME_DROPDOWN));
 		startTimeDropdown.click();
 	}
 	
 	private static void clickEndTimeDropdown() {
-		WebElement endTimeDropdown = driver.findElement(By.id(END_TIME_DROPDOWN));
+		WebElement endTimeDropdown = driver.findElement(By.cssSelector(END_TIME_DROPDOWN));
 		endTimeDropdown.click();
 	}
 	
 	private static void selectStartTime(String startTime) {
-		WebElement startTimeButton = driver.findElement(By.xpath("//*[text()=startTime]"));
-		startTimeButton.click();
+		//WebElement startTimeButton = driver.findElement(By.xpath("//*[text()='"+ startTime +"']"));
+		//startTimeButton.click();
+		
+		WebElement startTimeButton = driver.findElement(By.cssSelector(".dropdown-menu.show"));
+		List<WebElement> timeList=startTimeButton.findElements(By.tagName("li"));
+		
+		System.out.println(startTime);
+		for (WebElement li : timeList) {
+			String currentTime = li.getText();
+			System.out.println(currentTime);
+			
+			boolean comp = currentTime.toString().equals(startTime.toString());
+			System.out.println(comp);
+			if (comp) {
+				 System.out.println("Success");
+			     li.click();
+			     break;
+		    }
+		}
 	}
 	
 	private static void selectEndTime() {
