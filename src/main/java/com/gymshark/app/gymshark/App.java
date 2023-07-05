@@ -1,30 +1,16 @@
 package com.gymshark.app.gymshark;
+import java.text.Normalizer;
+import java.text.ParseException;
 import java.time.Duration;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.time.LocalDateTime;  
-import java.time.format.DateTimeFormatter;  
 
-import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 
-import java.util.*;
-import java.text.Normalizer;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-//import org.apache.commons.lang3.StringEscapeUtils.escapeHtml4;
-
 public class App 
 {
-	//Constants
 	private static final String USERNAME_TEXTBOX = "login-email";
 	private static final String PASSWORD_TEXTBOX = "login-password";
 	private static final String LOGIN_BUTTON = ".btn.py-3-2.w-100.btn-brand-primary";
@@ -32,9 +18,11 @@ public class App
 	private static final String START_TIME_DROPDOWN = ".col-6.col-lg-3.mb-std.pe-2"; 
 	private static final String END_TIME_DROPDOWN = ".col-6.col-lg-3.mb-std.ps-2";
 	private static final String SPACES_DROPDOWN = ".svg-inline--fa.fa-triangle-exclamation.fa-fw.text-danger";
+	private static final String SELECTED_SPACES_SQUARES = ".svg-inline--fa.fa-grip.fa-fw";
 	private static final String MAIN_GYM1 = "MAIN GYM - Person 1";
 	private static final String MAIN_GYM2 = "MAIN GYM - Person 2";
-	private static final String CONFIRM_BOOKING_BUTTON = ".btn.btn-success";
+	private static final String SUITE_NUMBER_LABEL = ".form-label.text-uppercase";
+	private static final String CONFIRM_BOOKING_BUTTON = ".overlap-children";
 	
 	
 	//Initiating your Chrome driver
@@ -53,10 +41,6 @@ public class App
 		endTime = args[3];
 		String url = args[4];
 		String suiteNumber = args[5];
-		
-		//Handle time formatting
-		//startTime = formatTime(startTime).strip();
-		//endTime = formatTime(endTime).strip();
 			
 		//Applied wait time
 		driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
@@ -96,14 +80,17 @@ public class App
 		//Book both main gym spaces
 		selectMainGymCheckboxes();
 		
+		//Close spaces drop down 
+		closeSpacesDropDown();
+		
 		//Fill out suite number textbox
 		enterSuiteNumber(suiteNumber);
 		
 		//Click Confirm Booking button
-		//confirmBooking();              //TODO: Uncomment once everything is tested 
+	    confirmBooking();               
 		
 		//closing the browser
-		//driver.close();
+		driver.close();
 	}
 	
 	private static void login(String username, String password) throws InterruptedException {
@@ -147,9 +134,13 @@ public class App
 		spacesDropDown.click();
 	}
 	
+	private static void closeSpacesDropDown( ) {
+		WebElement spacesSquares = driver.findElement(By.cssSelector(SELECTED_SPACES_SQUARES));
+		spacesSquares.click();
+	}
+	
 	
 	private static void selectStartTime() throws ParseException {
-		
 		WebElement startTimeButton = driver.findElement(By.cssSelector(".dropdown-menu.show"));
 		List<WebElement> timeList = startTimeButton.findElements(By.tagName("li"));
 		
@@ -198,18 +189,16 @@ public class App
 	}
 	
 	private static void enterSuiteNumber(String suiteNumber) {
-		//TODO: Fix XPATH to the enterSuiteNumber textbox
-		//WebElement suiteDiv = driver.findElement(By.cssSelector(".col-12.mb-std.required"));
-		//suiteDiv.findElement(By.cssSelector(".ember-text-field.ember-view.form-control"));
-	
-		WebElement textbox = driver.findElement(By.xpath("//div[@class='.col-12.mb-std.required']/input"));
+		WebElement suiteNumberLabel = driver.findElement(By.cssSelector(SUITE_NUMBER_LABEL));
+		String textboxId = suiteNumberLabel.getAttribute("for");
+		WebElement textbox = driver.findElement(By.id(textboxId));
 		textbox.clear();
 		textbox.sendKeys(suiteNumber);
 	}
 	
 	private static void confirmBooking() {
-		WebElement bookingButton = driver.findElement(By.cssSelector(BOOKING_BUTTON));
-		bookingButton.click();
+		WebElement confirmBookingButton = driver.findElement(By.cssSelector(CONFIRM_BOOKING_BUTTON));
+		confirmBookingButton.click();
 	}
 	
 	private static String normalizeHTMLText(String text) {
@@ -217,10 +206,5 @@ public class App
 		//Compare each character against the ASCII character.
 		String normalString = canonicalDecomposition.replaceAll("[^\\p{ASCII}]", "");
 		return normalString;
-	}
-	
-	private static String formatTime(String time) {
-		String[] timearray = time.split("-");
-		return timearray[0] + " " + timearray[1];
 	}
 }
