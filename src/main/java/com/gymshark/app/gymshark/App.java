@@ -8,6 +8,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 
 public class App 
 {
@@ -24,6 +25,12 @@ public class App
 	private static final String SUITE_NUMBER_LABEL = ".form-label.text-uppercase";
 	private static final String CONFIRM_BOOKING_BUTTON = ".overlap-children";
 	
+	private static final ChromeOptions options = new ChromeOptions()
+			.addArguments("--no-sandbox")
+			.addArguments("--headless")
+			.addArguments("start-maximized")
+			.addArguments("disable-infobars")
+			.addArguments("--disable-extensions");
 	
 	//Initiating your Chrome driver
 	private static WebDriver driver = new ChromeDriver();
